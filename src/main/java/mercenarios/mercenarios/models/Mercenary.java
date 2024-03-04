@@ -1,9 +1,9 @@
 package mercenarios.mercenarios.models;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.annotation.PostConstruct;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,8 +15,6 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import mercenarios.mercenarios.repositories.EquipmentRepository;
-import mercenarios.mercenarios.repositories.MercenaryRepository;
 
 @Entity
 @Table(name = "mercenary")
@@ -32,6 +30,7 @@ public class Mercenary {
 
     @ManyToOne
     @JoinColumn(name = "parent_id", referencedColumnName = "id")
+
     private Mercenary parent;
 
     @ManyToMany

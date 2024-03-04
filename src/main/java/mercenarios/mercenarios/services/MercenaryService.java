@@ -11,8 +11,10 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.persistence.EntityNotFoundException;
 import mercenarios.mercenarios.models.Equipment;
 import mercenarios.mercenarios.models.Mercenary;
+import mercenarios.mercenarios.models.Skill;
 import mercenarios.mercenarios.repositories.EquipmentRepository;
 import mercenarios.mercenarios.repositories.MercenaryRepository;
+import mercenarios.mercenarios.repositories.SkillRepository;
 
 @Service
 public class MercenaryService {
@@ -21,6 +23,9 @@ public class MercenaryService {
 
     @Autowired
     private EquipmentRepository equipmentRepository;
+
+    @Autowired
+    private SkillRepository skillRepository;
 
     @Autowired
 
@@ -53,7 +58,7 @@ public class MercenaryService {
         }
     }
 
-    public void assignEquipmentToMercenary(Integer mercenaryId, Integer equipmentId) {
+    public Mercenary assignEquipmentToMercenary(Integer mercenaryId, Integer equipmentId) {
         Optional<Mercenary> mercenaryOptional = mercenaryRepository.findById(mercenaryId);
         Optional<Equipment> equipmentOptional = equipmentRepository.findById(equipmentId);
 
@@ -62,9 +67,42 @@ public class MercenaryService {
             Equipment equipment = equipmentOptional.get();
 
             mercenary.getEquipment().add(equipment);
-            mercenaryRepository.save(mercenary);
+            return mercenaryRepository.save(mercenary);
         } else {
             throw new EntityNotFoundException("Mercenary or Equipment not found");
+        }
+    }
+
+    public Mercenary assignSkillToMercenary(Integer mercenaryId, Integer skillId) {
+        Optional<Mercenary> mercenaryOptional = mercenaryRepository.findById(mercenaryId);
+        Optional<Skill> skillOptional = skillRepository.findById(skillId);
+
+        if (mercenaryOptional.isPresent() && skillOptional.isPresent()) {
+            Mercenary mercenary = mercenaryOptional.get();
+            Skill skill = skillOptional.get();
+
+            mercenary.getSkills().add(skill);
+            skill.getMercenaries().add(mercenary);
+            skillRepository.save(skill);
+
+            return mercenaryRepository.save(mercenary);
+        } else {
+            throw new EntityNotFoundException("Mercenary or Skill not found");
+        }
+    }
+
+    public Mercenary assignSuperiorToMercenary(Integer mercenaryId, Integer superiorId) {
+        Optional<Mercenary> mercenaryOptional = mercenaryRepository.findById(mercenaryId);
+        Optional<Mercenary> superiorOptional = mercenaryRepository.findById(superiorId);
+
+        if (mercenaryOptional.isPresent() && superiorOptional.isPresent()) {
+            Mercenary mercenary = mercenaryOptional.get();
+            Mercenary superior = superiorOptional.get();
+
+            mercenary.setParent(superior);
+            return mercenaryRepository.save(mercenary);
+        } else {
+            throw new EntityNotFoundException("Mercenary or Superior not found");
         }
     }
 
